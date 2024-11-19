@@ -62,6 +62,7 @@ var modelViewMatrix, projectionMatrix;
 var Base = 0;
 var LowerArm = 1;
 var UpperArm = 2;
+var track = 3;
 
 
 var theta= [ 0, -60, 90];
@@ -158,6 +159,9 @@ function init() {
     document.getElementById("slider3").onchange = function(event) {
          theta[2] =  event.target.value;
     };
+    document.getElementById("slider4").onchange = function(event) {
+         theta[3] =  event.target.value;
+   };
 
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
 
@@ -227,7 +231,7 @@ function lowerArm()
 
 function cockpit() {  // Renamed function
     var s = scale(COCKPIT_WIDTH, COCKPIT_HEIGHT, COCKPIT_DEPTH);
-    var instanceMatrix = mult(translate(-BASE_WIDTH / 2 + 1.0, COCKPIT_HEIGHT, COCKPIT_DEPTH - 0.8), s);
+    var instanceMatrix = mult(translate(-BASE_WIDTH /4 + 2.7, COCKPIT_HEIGHT, COCKPIT_DEPTH - 0.8), s);
 
     var t = mult(modelViewMatrix, instanceMatrix);
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
