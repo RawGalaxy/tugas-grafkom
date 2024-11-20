@@ -10,6 +10,9 @@ var ambientProductLoc, diffuseProductLoc, specularProductLoc, lightPositionLoc;
 // Properti pencahayaan
 var ambientProduct, diffuseProduct, specularProduct, lightPosition;
 
+var rotating = false;
+var rotationSpeed = 1;
+
 var points = [];
 var colors = [];
 
@@ -27,13 +30,13 @@ var vertices = [
 // RGBA colors
 var vertexColors = [
     vec4( 0.0, 0.0, 0.0, 1.0 ),  // black
-    vec4( 1.0, 0.0, 0.0, 1.0 ),  // red
     vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
-    vec4( 0.0, 1.0, 0.0, 1.0 ),  // green
-    vec4( 0.0, 0.0, 1.0, 1.0 ),  // blue
-    vec4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
-    vec4( 1.0, 1.0, 1.0, 1.0 ),  // white
-    vec4( 0.0, 1.0, 1.0, 1.0 )   // cyan
+    vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
+    vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
+    vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
+    vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
+    vec4( 0.0, 1.0, 1.0, 0.5 ),  // cyan
+    vec4( 1.0, 1.0, 0.0, 1.0 )   // yellow
 ];
 
 
@@ -168,7 +171,15 @@ function init() {
     document.getElementById("slider4").onchange = function(event) {
          theta[3] =  event.target.value;
    };
-
+   document.getElementById("rotateButton").onclick = function() {
+    if (rotating) {
+        stopRotation(); 
+        this.innerHTML = "Start Rotation"; 
+    } else {
+        startRotation(); 
+        this.innerHTML = "Stop Rotation"; 
+    }
+    };  
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
 
     projectionMatrix = ortho(-10, 10, -10, 10, -10, 10);
@@ -276,6 +287,25 @@ function track2() {  // Renamed function
     var t = mult(modelViewMatrix, instanceMatrix);
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
     gl.drawArrays(gl.TRIANGLES, 0, NumVertices);
+}
+
+function startRotation() {
+    rotating = true;
+    rotateArm();
+}
+
+function stopRotation() {
+    rotating = false;
+}
+
+function rotateArm() {
+    if (rotating) {
+        theta[Base] += rotationSpeed;
+
+        if (theta[Base] > 180) theta[Base] = -180;
+        render();
+        setTimeout(rotateArm, 8);
+    }
 }
 
 function render() {
