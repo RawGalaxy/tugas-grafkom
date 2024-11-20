@@ -4,6 +4,12 @@ var canvas, gl, program;
 
 var NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
 
+// Lokasi uniform untuk variabel pencahayaan
+var ambientProductLoc, diffuseProductLoc, specularProductLoc, lightPositionLoc;
+
+// Properti pencahayaan
+var ambientProduct, diffuseProduct, specularProduct, lightPosition;
+
 var points = [];
 var colors = [];
 
@@ -168,6 +174,20 @@ function init() {
     projectionMatrix = ortho(-10, 10, -10, 10, -10, 10);
     gl.uniformMatrix4fv( gl.getUniformLocation(program, "projectionMatrix"),  false, flatten(projectionMatrix) );
 
+    //lighting
+
+    // Inisialisasi nilai pencahayaan
+    ambientProduct = mult(vec3(0.6, 0.2, 0.0), vec3(1.0, 1.0, 1.0));
+    diffuseProduct = mult(vec3(0.6, 0.3, 0.0), vec3(1.0, 1.0, 1.0));
+    specularProduct = mult(vec3(0.6, 0.3, 0.0), vec3(1.0, 1.0, 1.0));
+    lightPosition = vec4(1.0, 1.0, 1.0, 0.0);
+
+    // Dapatkan lokasi uniform untuk variabel pencahayaan
+    ambientProductLoc = gl.getUniformLocation(program, "ambientProduct");
+    diffuseProductLoc = gl.getUniformLocation(program, "diffuseProduct");
+    specularProductLoc = gl.getUniformLocation(program, "specularProduct");
+    lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
+
     render();
 }
 
@@ -261,6 +281,13 @@ function track2() {  // Renamed function
 function render() {
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+
+    gl.uniform3fv(ambientProductLoc, flatten(ambientProduct));
+    gl.uniform3fv(diffuseProductLoc, flatten(diffuseProduct));
+    gl.uniform3fv(specularProductLoc, flatten(specularProduct));
+    gl.uniform4fv(lightPositionLoc, flatten(lightPosition));
+
+    gl.drawArrays(gl.TRIANGLES, 0, NumVertices);
 
     modelViewMatrix = rotate(theta[Base], vec3(0, 1, 0 ));
     track1();
