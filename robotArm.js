@@ -62,8 +62,11 @@ var TRACK2_WIDTH = 6.0;
 var TRACK2_HEIGHT = 0.85;
 var TRACK2_DEPTH = 1.0;
 
-// Shader transformation matrices
+var BUCKET_WIDTH = 2.0;
+var BUCKET_HEIGHT = 2.0;
+var BUCKET_DEPTH = 2.0;
 
+// Shader transformation matrices
 var modelViewMatrix, projectionMatrix;
 
 // Array of rotation angles (in degrees) for each rotation axis
@@ -72,6 +75,7 @@ var Base = 0;
 var LowerArm = 1;
 var UpperArm = 2;
 var track = 3;
+var Bucket = 4;
 
 
 var theta= [ 0, -60, 90];
@@ -170,7 +174,10 @@ function init() {
     };
     document.getElementById("slider4").onchange = function(event) {
          theta[3] =  event.target.value;
-   };
+    };
+   document.getElementById("slider5").onchange = function(event) {
+        theta[4] =  event.target.value;
+    };
    document.getElementById("rotateButton").onclick = function() {
     if (rotating) {
         stopRotation(); 
@@ -204,6 +211,25 @@ function init() {
 
 //----------------------------------------------------------------------------
 
+function track1() {  // Renamed function
+    var s = scale(TRACK1_WIDTH, TRACK1_HEIGHT, TRACK1_DEPTH);
+    var instanceMatrix = mult(translate(0.0, TRACK1_HEIGHT - 1.0, TRACK1_DEPTH + 0.8), s);
+
+    var t = mult(modelViewMatrix, instanceMatrix);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
+    gl.drawArrays(gl.TRIANGLES, 0, NumVertices);
+}
+
+function track2() {  // Renamed function
+    var s = scale(TRACK2_WIDTH, TRACK2_HEIGHT, TRACK2_DEPTH);
+    var instanceMatrix = mult(translate(0.0, TRACK2_HEIGHT - 1.0, -TRACK2_DEPTH - 0.8), s);
+
+    var t = mult(modelViewMatrix, instanceMatrix);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
+    gl.drawArrays(gl.TRIANGLES, 0, NumVertices);
+}
+
+//----------------------------------------------------------------------------
 
 function base() {
     var s = scale(BASE_WIDTH, BASE_HEIGHT, BASE_WIDTH);
@@ -271,23 +297,16 @@ function cockpit() {  // Renamed function
 
 //----------------------------------------------------------------------------
 
-function track1() {  // Renamed function
-    var s = scale(TRACK1_WIDTH, TRACK1_HEIGHT, TRACK1_DEPTH);
-    var instanceMatrix = mult(translate(0.0, TRACK1_HEIGHT - 1.0, TRACK1_DEPTH + 0.8), s);
-
+function bucket() {
+    var s = scale(BUCKET_WIDTH, BUCKET_HEIGHT, BUCKET_DEPTH);
+    var instanceMatrix = mult(translate(0.0, 0.5 * UPPER_ARM_HEIGHT , 0.0), s); 
+    
     var t = mult(modelViewMatrix, instanceMatrix);
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
     gl.drawArrays(gl.TRIANGLES, 0, NumVertices);
 }
 
-function track2() {  // Renamed function
-    var s = scale(TRACK2_WIDTH, TRACK2_HEIGHT, TRACK2_DEPTH);
-    var instanceMatrix = mult(translate(0.0, TRACK2_HEIGHT - 1.0, -TRACK2_DEPTH - 0.8), s);
-
-    var t = mult(modelViewMatrix, instanceMatrix);
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-    gl.drawArrays(gl.TRIANGLES, 0, NumVertices);
-}
+//----------------------------------------------------------------------------
 
 function startRotation() {
     rotating = true;
@@ -336,6 +355,10 @@ function render() {
     modelViewMatrix = mult(modelViewMatrix, translate(0.0, LOWER_ARM_HEIGHT , 0.0)); // Translate in x and y direction
     modelViewMatrix = mult(modelViewMatrix, rotate(theta[UpperArm], vec3(0, 0, 1)));
     upperArm();
+
+    modelViewMatrix = mult(modelViewMatrix, translate(0.0, UPPER_ARM_HEIGHT , 0.0));       // Translate to the end of the lower arm
+    modelViewMatrix = mult(modelViewMatrix, rotate(theta[Bucket], vec3(0, 0, 1)));  // Rotate with the lower arm
+    bucket();
 
 //printm(modelViewMatrix);
 
